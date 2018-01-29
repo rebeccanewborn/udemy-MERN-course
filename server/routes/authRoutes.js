@@ -6,18 +6,32 @@ module.exports = app => {
     passport.authenticate("google", { scope: ["profile", "email"] })
   );
 
-  app.get("/auth/google/callback", passport.authenticate("google"));
+  app.get(
+    "/auth/google/callback",
+    passport.authenticate("google"),
+    (req, res) => {
+      res.redirect("/surveys");
+    }
+  );
 
   app.get(
     "/auth/facebook",
     passport.authenticate("facebook", { scope: ["public_profile", "email"] })
   );
 
-  app.get("/auth/facebook/callback", passport.authenticate("facebook"));
+  //after user comes back from oauth flow, passport middleware takes over, and then passes request on to callback
+  //res has method redirect in addition to send
+  app.get(
+    "/auth/facebook/callback",
+    passport.authenticate("facebook"),
+    (req, res) => {
+      res.redirect("/surveys");
+    }
+  );
 
   app.get("/api/logout", (req, res) => {
     req.logout();
-    res.send(req.user);
+    res.redirect("/");
   });
 
   app.get("/api/current_user", (req, res) => {
